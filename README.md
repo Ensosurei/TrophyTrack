@@ -1,2 +1,2 @@
 # Trophy Track
-Aplicacion desarrollada con KMP (Kotlin multiplatform), la cual esta diseñada para que el usuario pueda tener una gestion en logros de videojuegos, funcional en android y escritorio
+Application developed with KMP (Kotlin multiplatform), designed to allow users to manage video game achievements, functional on Android and desktop.
