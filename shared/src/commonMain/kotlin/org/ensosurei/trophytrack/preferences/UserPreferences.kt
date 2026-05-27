@@ -3,6 +3,8 @@ package org.ensosurei.trophytrack.preferences
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class UserPreferences(private val dataStore : DataStore<Preferences>) {
     companion object PreferencesKeys{
@@ -12,4 +14,9 @@ class UserPreferences(private val dataStore : DataStore<Preferences>) {
         val localAvatarPath = stringPreferencesKey("local_avatar_path")
         val localName = stringPreferencesKey("local_name")
     }
+    val steamIdFlow : Flow<String> = dataStore.data.map { it[PreferencesKeys.steamId]?: "" }
+    val steamNameFlow : Flow<String> = dataStore.data.map { it[PreferencesKeys.steamName]?: "" }
+    val steamAvatarFlow : Flow<String> = dataStore.data.map { it[PreferencesKeys.steamAvatarUrl]?: "" }
+    val localNameFlow : Flow<String> = dataStore.data.map { it[PreferencesKeys.localName]?: "Jugador Local" }
+    val  localAvatarPathFlow : Flow<String> = dataStore.data.map { it[PreferencesKeys.localAvatarPath]?: "avatar_default" }
 }
