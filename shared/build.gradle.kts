@@ -46,7 +46,7 @@ kotlin {
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
 
-            //IMPLEMENTATION OF DATASTORE
+            // IMPLEMENTATION OF DATASTORE
             implementation(libs.androidx.datastore.preferences)
         }
         commonTest.dependencies {
@@ -55,7 +55,7 @@ kotlin {
     }
 }
 
-// CONFIGURACIÓN DEL DIRECTORIO DE ESQUEMAS
+// SCHEMAS DIRECTORY CONFIGURATION
 room {
     schemaDirectory("$projectDir/schemas")
 }
