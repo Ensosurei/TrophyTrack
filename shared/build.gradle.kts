@@ -42,9 +42,12 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
-            // LIBRERÍAS DE ROOM PARA KMP
+            // LIBRARIES OF ROOM FOR KMP
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
+
+            // IMPLEMENTATION OF DATASTORE
+            implementation(libs.androidx.datastore.preferences)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -52,7 +55,7 @@ kotlin {
     }
 }
 
-// CONFIGURACIÓN DEL DIRECTORIO DE ESQUEMAS
+// SCHEMAS DIRECTORY CONFIGURATION
 room {
     schemaDirectory("$projectDir/schemas")
 }
@@ -60,7 +63,7 @@ room {
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
 
-    // COMPILADORES DE ROOM
+    // ROOM COMPILATORS
     add("kspAndroid", libs.room.compiler)
     add("kspJvm", libs.room.compiler)
 }
