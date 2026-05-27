@@ -2,6 +2,7 @@ package org.ensosurei.trophytrack.preferences
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,4 +20,19 @@ class UserPreferences(private val dataStore : DataStore<Preferences>) {
     val steamAvatarFlow : Flow<String> = dataStore.data.map { it[PreferencesKeys.steamAvatarUrl]?: "" }
     val localNameFlow : Flow<String> = dataStore.data.map { it[PreferencesKeys.localName]?: "Jugador Local" }
     val  localAvatarPathFlow : Flow<String> = dataStore.data.map { it[PreferencesKeys.localAvatarPath]?: "avatar_default" }
+
+    suspend fun updateLocalProfile(newLocalName: String, newLocalAvatarPath: String){
+        dataStore.edit { preferences ->
+            preferences[localName] = newLocalName
+            preferences[localAvatarPath] = newLocalAvatarPath
+        }
+    }
+
+    suspend fun updateSteamProfile(newSteamId:String, newSteamName: String, newSteamAvatarUrl: String){
+        dataStore.edit { preferences ->
+            preferences[steamId] = newSteamId
+            preferences[steamName] = newSteamName
+            preferences[steamAvatarUrl] = newSteamAvatarUrl
+        }
+    }
 }
