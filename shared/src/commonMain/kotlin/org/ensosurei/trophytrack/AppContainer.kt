@@ -1,6 +1,8 @@
-package org.ensosurei.trophytrack.preferences
+package org.ensosurei.trophytrack
 
 import org.ensosurei.trophytrack.database.DatabaseBuilder
+import org.ensosurei.trophytrack.preferences.DataStoreFactory
+import org.ensosurei.trophytrack.preferences.UserPreferences
 
 class AppContainer(val storeFactory : DataStoreFactory, val dataBuilder: DatabaseBuilder) {
     val db by lazy { dataBuilder.createBuilder().build() }
