@@ -59,13 +59,20 @@ fun App(container: AppContainer) {
                     )
                 }
             }*/
-
+            Text(text = "$localName, $localAvatar")
             Button(onClick = {
                 scope.launch {
                     userPrefs.updateLocalProfile("Mercedes-Tester", "avatar_prueba.png")
                 }
             }) {
                 Text("Guardar Nombre")
+            }
+            Button(onClick = {
+                scope.launch {
+                    userPrefs.clearLocalProfile()
+                }
+            }) {
+                Text("Borrar Todo")
             }
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
