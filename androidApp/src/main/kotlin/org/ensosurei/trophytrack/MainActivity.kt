@@ -11,7 +11,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        val container = (applicationContext as TrophyTrackApp).appContainer
+        val container = (application as TrophyTrackApp).appContainer
 
         setContent {
             App(container = container)
