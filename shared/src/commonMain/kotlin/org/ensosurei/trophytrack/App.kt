@@ -6,14 +6,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 import trophytrack.shared.generated.resources.Res
@@ -21,6 +25,14 @@ import trophytrack.shared.generated.resources.compose_multiplatform
 
 @Composable
 fun App(container: AppContainer) {
+    val userPrefs = container.userPreferences
+    val localName by userPrefs.localNameFlow.collectAsState(initial = null)
+    val localAvatar by userPrefs.localAvatarPathFlow.collectAsState(initial = null)
+    val steamName by userPrefs.steamNameFlow.collectAsState(initial = null)
+    val steamId by userPrefs.steamIdFlow.collectAsState(initial = null)
+    val steamAvatar by userPrefs.steamAvatarFlow.collectAsState(initial = null)
+
+    val scope = rememberCoroutineScope()
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -30,8 +42,30 @@ fun App(container: AppContainer) {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+            /*if(localName == null)
+                CircularProgressIndicator()
+            else{
+                if(steamId.isNullOrEmpty()){
+                    Text(
+                        text = "Welcome Back, $localName",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }else{
+                    Text(
+                        text = "Welcome Back, $steamName",
+                        style = MaterialTheme.typography.headlineMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }*/
+
+            Button(onClick = {
+                scope.launch {
+                    userPrefs.updateLocalProfile("Mercedes-Tester", "avatar_prueba.png")
+                }
+            }) {
+                Text("Guardar Nombre")
             }
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
@@ -46,3 +80,4 @@ fun App(container: AppContainer) {
         }
     }
 }
+
