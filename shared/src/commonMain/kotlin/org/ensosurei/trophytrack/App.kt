@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 
 import trophytrack.shared.generated.resources.Res
@@ -30,6 +31,8 @@ fun App(container: AppContainer) {
     val steamName by userPrefs.steamNameFlow.collectAsState(initial = null)
     val steamId by userPrefs.steamIdFlow.collectAsState(initial = null)
     val steamAvatar by userPrefs.steamAvatarFlow.collectAsState(initial = null)
+
+    val scope = rememberCoroutineScope()
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -39,7 +42,7 @@ fun App(container: AppContainer) {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if(localName == null)
+            /*if(localName == null)
                 CircularProgressIndicator()
             else{
                 if(steamId.isNullOrEmpty()){
@@ -55,10 +58,14 @@ fun App(container: AppContainer) {
                         modifier = Modifier.padding(16.dp)
                     )
                 }
-            }
+            }*/
 
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
+            Button(onClick = {
+                scope.launch {
+                    userPrefs.updateLocalProfile("Mercedes-Tester", "avatar_prueba.png")
+                }
+            }) {
+                Text("Guardar Nombre")
             }
             AnimatedVisibility(showContent) {
                 val greeting = remember { Greeting().greet() }
