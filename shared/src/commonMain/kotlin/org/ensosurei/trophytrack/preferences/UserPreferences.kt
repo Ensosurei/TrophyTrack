@@ -35,4 +35,19 @@ class UserPreferences(private val dataStore : DataStore<Preferences>) {
             preferences[steamAvatarUrl] = newSteamAvatarUrl
         }
     }
+
+    suspend fun clearLocalProfile(){
+        dataStore.edit{ preferences ->
+            preferences.remove(localName)
+            preferences.remove(localAvatarPath)
+        }
+    }
+
+    suspend fun clearSteamProfile(){
+        dataStore.edit{ preferences ->
+            preferences.remove(steamId)
+            preferences.remove(steamName)
+            preferences.remove(steamAvatarUrl)
+        }
+    }
 }
