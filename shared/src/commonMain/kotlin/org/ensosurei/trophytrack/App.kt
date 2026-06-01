@@ -20,8 +20,7 @@ import trophytrack.shared.generated.resources.Res
 import trophytrack.shared.generated.resources.compose_multiplatform
 
 @Composable
-@Preview
-fun App() {
+fun App(container: AppContainer) {
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
