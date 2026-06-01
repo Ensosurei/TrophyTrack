@@ -13,6 +13,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "TrophyTrack",
     ) {
-        App(appContainer)
+        App(container = appContainer)
     }
 }
