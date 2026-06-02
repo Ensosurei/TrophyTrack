@@ -41,7 +41,7 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.compose.materialIconsExtended)
+            implementation("org.jetbrains.compose.material:material-icons-extended:1.11.0")
 
             // LIBRARIES OF ROOM FOR KMP
             implementation(libs.room.runtime)
