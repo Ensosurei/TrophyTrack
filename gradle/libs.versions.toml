@@ -20,6 +20,8 @@ roomKmp = "2.7.0"
 sqliteBundled = "2.5.0"
 
 [libraries]
+compose-materialIconsExtended = { module = "org.jetbrains.compose.components:components-resources-icons-extended", version.ref = "composeMultiplatform" }
+
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
