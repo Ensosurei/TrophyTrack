@@ -53,13 +53,17 @@ fun DashboardScreen(){
                 NavigationBarItem(
                     selected = (status == 0),
                     onClick = { status = 0 },
-                    icon = { Res.drawable.ic_home },
+                    icon = { Icon(
+                        vectorResource(Res.drawable.ic_home),
+                        contentDescription = "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
                     selected = (status == 1),
                     onClick = { status = 1},
-                    icon = { Res.drawable.ic_library },
+                    icon = { Icon(
+                        vectorResource(Res.drawable.ic_library),
+                        contentDescription = "Library") },
                     label = { Text("Library") }
                 )
                 NavigationBarItem(
@@ -72,13 +76,17 @@ fun DashboardScreen(){
                 NavigationBarItem(
                     selected = (status == 2),
                     onClick = { status = 2},
-                    icon = { Res.drawable.ic_inbox },
+                    icon = { Icon(
+                        vectorResource(Res.drawable.ic_inbox),
+                        contentDescription = "Activity") },
                     label = { Text("Activity") }
                 )
                 NavigationBarItem(
                     selected = (status == 3),
                     onClick = { status = 3},
-                    icon = { Res.drawable.ic_profile },
+                    icon = { Icon(
+                        vectorResource(Res.drawable.ic_profile),
+                        contentDescription = "Profile") },
                     label = { Text("Profile") }
                 )
             }
