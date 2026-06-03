@@ -19,7 +19,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.vectorResource
 import trophytrack.shared.generated.resources.Res
 import trophytrack.shared.generated.resources.ic_home
@@ -29,7 +28,6 @@ import trophytrack.shared.generated.resources.ic_plus
 import trophytrack.shared.generated.resources.ic_profile
 
 @Composable
-@Preview
 fun DashboardScreen(){
     var testButton by remember { mutableStateOf(false) }
     var status by remember { mutableIntStateOf(0) }
