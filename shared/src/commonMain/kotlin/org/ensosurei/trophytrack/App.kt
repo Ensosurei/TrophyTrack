@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import org.ensosurei.trophytrack.ui.components.GamesGrid
 import org.jetbrains.compose.resources.painterResource
 
 import trophytrack.shared.generated.resources.Res
@@ -31,8 +32,9 @@ fun App(container: AppContainer) {
     val steamName by userPrefs.steamNameFlow.collectAsState(initial = null)
     val steamId by userPrefs.steamIdFlow.collectAsState(initial = null)
     val steamAvatar by userPrefs.steamAvatarFlow.collectAsState(initial = null)
-
+    val games by container.db.gameDao().getAllGames().collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
+
     MaterialTheme {
         var showContent by remember { mutableStateOf(false) }
         Column(
@@ -42,23 +44,7 @@ fun App(container: AppContainer) {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            /*if(localName == null)
-                CircularProgressIndicator()
-            else{
-                if(steamId.isNullOrEmpty()){
-                    Text(
-                        text = "Welcome Back, $localName",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }else{
-                    Text(
-                        text = "Welcome Back, $steamName",
-                        style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }*/
+            GamesGrid(gameList = games)
             Text(text = "$localName, $localAvatar")
             Button(onClick = {
                 scope.launch {
