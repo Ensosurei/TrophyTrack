@@ -37,19 +37,3 @@ fun GamesGrid(
         }
     }
 }
-
-@Composable
-fun GameCard(gameTitle : String){
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = surface
-        ),
-        modifier = Modifier.fillMaxSize()
-    ){
-        Text(
-            text = gameTitle,
-            color = white,
-            modifier = Modifier.padding((16.dp))
-        )
-    }
-}
