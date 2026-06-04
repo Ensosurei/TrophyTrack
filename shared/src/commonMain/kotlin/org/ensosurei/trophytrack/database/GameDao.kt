@@ -19,4 +19,6 @@ interface GameDao {
     @Query("SELECT * FROM GameEntity WHERE status='COMPLETED'")
     fun getCompletedGames(): Flow<List<GameEntity>>
 
+    @Query("SELECT * FROM GameEntity WHERE title LIKE :searchQuery")
+    fun searchGames(searchQuery: String): Flow<List<GameEntity>>
 }
