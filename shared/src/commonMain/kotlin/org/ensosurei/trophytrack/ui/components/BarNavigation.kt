@@ -20,7 +20,7 @@ import trophytrack.shared.generated.resources.ic_plus
 import trophytrack.shared.generated.resources.ic_profile
 
 @Composable
-fun NavigationBar(
+fun BarNavigation(
     currentStatus: Int,
     onStatusChange: (Int) -> Unit,
     onFabClick: () -> Unit,
