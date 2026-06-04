@@ -16,4 +16,7 @@ interface GameDao {
     @Query("SELECT * FROM GameEntity WHERE status='PLAYING'")
     fun getPlayingGames(): Flow<List<GameEntity>>
 
+    @Query("SELECT * FROM GameEntity WHERE status='COMPLETED'")
+    fun getCompletedGames(): Flow<List<GameEntity>>
+
 }
