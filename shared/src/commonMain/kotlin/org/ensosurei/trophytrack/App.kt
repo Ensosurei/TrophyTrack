@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.ensosurei.trophytrack.ui.components.GamesGrid
+import org.ensosurei.trophytrack.ui.screens.DashboardScreen
+import org.ensosurei.trophytrack.ui.theme.TrophyTrackTheme
 import org.jetbrains.compose.resources.painterResource
 
 import trophytrack.shared.generated.resources.Res
@@ -35,41 +38,9 @@ fun App(container: AppContainer) {
     val games by container.db.gameDao().getAllGames().collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
 
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            GamesGrid(gameList = games)
-            Text(text = "$localName, $localAvatar")
-            Button(onClick = {
-                scope.launch {
-                    userPrefs.updateLocalProfile("Mercedes-Tester", "avatar_prueba.png")
-                }
-            }) {
-                Text("Guardar Nombre")
-            }
-            Button(onClick = {
-                scope.launch {
-                    userPrefs.clearLocalProfile()
-                }
-            }) {
-                Text("Borrar Todo")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
+    TrophyTrackTheme {
+        Scaffold { paddingValues ->
+            DashboardScreen(paddingValues = paddingValues,container = container)
         }
     }
 }
