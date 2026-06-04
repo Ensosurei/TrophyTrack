@@ -1,10 +1,13 @@
 package org.ensosurei.trophytrack.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -17,6 +20,7 @@ import org.ensosurei.trophytrack.ui.theme.surface
 import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
 import trophytrack.shared.generated.resources.Res
+import trophytrack.shared.generated.resources.ic_filter
 import trophytrack.shared.generated.resources.ic_search
 
 @Composable
@@ -53,8 +57,9 @@ fun SearchBar(
         IconButton(
             onClick = {},
             modifier = Modifier.padding(start = 8.dp)
+                .background(color = surface, shape = RoundedCornerShape(16.dp)),
         ){
-            Text("Filter")
+            Icon(vectorResource(Res.drawable.ic_filter), contentDescription = null)
         }
     }
 }

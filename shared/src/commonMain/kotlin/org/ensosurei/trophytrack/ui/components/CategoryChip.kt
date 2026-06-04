@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,20 +47,17 @@ fun CategoryChip(
             }
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ){
+        Box(
+            modifier = Modifier
+                .size(6.dp)
+                .background(color = if(isSelected) pink else Color.Transparent, shape = CircleShape)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = text,
             color = if(isSelected) white else gray,
             fontSize = 16.sp,
             fontWeight = if(isSelected) FontWeight.Bold else FontWeight.Normal
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Box(
-            modifier = Modifier
-                .size(6.dp)
-                .background(pink, shape = CircleShape)
-                .graphicsLayer(alpha = alphaIndicator)
         )
     }
 }
