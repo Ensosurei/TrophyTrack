@@ -25,10 +25,10 @@ import trophytrack.shared.generated.resources.ic_search
 
 @Composable
 fun SearchBar(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    query: String,
+    onQueryChange: (String) -> Unit
 ){
-    var searchQuery by remember { mutableStateOf("") }
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -36,8 +36,8 @@ fun SearchBar(
         verticalAlignment = Alignment.CenterVertically
     ){
         OutlinedTextField(
-            value = searchQuery,
-            onValueChange = {searchQuery = it},
+            value = query,
+            onValueChange = onQueryChange,
             placeholder = { Text("Search...") },
             leadingIcon = {
                 Icon(
