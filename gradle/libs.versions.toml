@@ -18,11 +18,15 @@ material3 = "1.11.0-alpha07"
 ksp = "2.3.7"
 roomKmp = "2.7.0"
 sqliteBundled = "2.5.0"
-coil = "3.0.4"
+coil = "3.4.0"
+ktor = "3.5.0"
 
 [libraries]
-coil-compose = { module = "io.coil-kt.next:coil-compose", version.ref = "coil" }
-coil-network-ktor = { module = "io.coil-kt.next:coil-network-ktor", version.ref = "coil" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor", version.ref = "coil" }
+ktor-client-okhttp = {group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor"}
+
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
