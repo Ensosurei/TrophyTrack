@@ -48,7 +48,7 @@ fun DashboardScreen(
 ){
     var currentScreen by remember {mutableIntStateOf(0)}
     var selectedCategoryIndex by remember { mutableIntStateOf(0) }
-    val categories = listOf("Todos", "Steam", "PlayStation", "Xbox")
+    val categories = listOf("All", "Steam", "PlayStation", "Xbox")
     val currentPlatform = categories[selectedCategoryIndex]
     val playingGames by container.db.gameDao().getPlayingGames().collectAsState(initial = emptyList())
     val completedGames by container.db.gameDao().getCompletedGames().collectAsState(initial = emptyList())
@@ -133,7 +133,7 @@ fun DashboardScreen(
                                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                                 ){
                                     items(playingGames){ game ->
-                                        GameCard(gameTitle = game.title)
+                                        GameCard(gameTitle = game.title, imageUrl = "")
                                     }
                                 }
                             }
