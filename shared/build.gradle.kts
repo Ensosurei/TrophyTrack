@@ -51,7 +51,7 @@ kotlin {
             implementation(libs.androidx.datastore.preferences)
 
             implementation(libs.coil.compose)
-            implementation(libs.coil.network.ktor)
+            implementation(libs.coil.network.ktor3)
 
             implementation(libs.ktor.client.core)
         }
