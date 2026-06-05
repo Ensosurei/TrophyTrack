@@ -133,7 +133,7 @@ fun DashboardScreen(
                                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                                 ){
                                     items(playingGames){ game ->
-                                        GameCard(gameTitle = game.title)
+                                        GameCard(gameTitle = game.title, imageUrl = "")
                                     }
                                 }
                             }

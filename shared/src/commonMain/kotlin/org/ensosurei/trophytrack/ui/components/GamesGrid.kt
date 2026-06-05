@@ -32,7 +32,8 @@ fun GamesGrid(
     ){
         items(gameList){ game ->
             GameCard(
-                gameTitle = game.title
+                gameTitle = game.title,
+                imageUrl = ""
             )
         }
     }
