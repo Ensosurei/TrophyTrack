@@ -15,7 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import org.ensosurei.trophytrack.database.GameEntity
 import org.ensosurei.trophytrack.ui.theme.green
 import org.ensosurei.trophytrack.ui.theme.surface
@@ -27,7 +29,8 @@ import trophytrack.shared.generated.resources.ic_medal
 fun GameMiniCard(
     modifier: Modifier = Modifier,
     gameEntity: GameEntity,
-    onCardClick: () -> Unit = {}
+    onCardClick: () -> Unit = {},
+    imageUrl: String,
 ){
     Card(
         onClick = onCardClick,
@@ -46,7 +49,15 @@ fun GameMiniCard(
                             colors = listOf(surface, Color.Black)
                         )
                     )
-            )
+            ){
+                AsyncImage(
+                    model = imageUrl,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentDescription = null
+                )
+            }
 
             if(gameEntity.status == "COMPLETED"){
                 Box(
@@ -55,12 +66,11 @@ fun GameMiniCard(
                         .align(Alignment.TopEnd)
                         .padding(top = 8.dp, end = 8.dp)
                         .size(24.dp)
-                        .background(green, shape = CircleShape)
-                        .border(1.5.dp, Color.Black, CircleShape)
                 ){
                     Icon(
                         vectorResource(Res.drawable.ic_medal),
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = green
                     )
                 }
             }

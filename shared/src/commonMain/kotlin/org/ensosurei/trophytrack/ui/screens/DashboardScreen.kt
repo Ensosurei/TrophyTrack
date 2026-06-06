@@ -26,12 +26,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.ensosurei.trophytrack.AppContainer
+import org.ensosurei.trophytrack.database.GameEntity
 import org.ensosurei.trophytrack.ui.components.BarNavigation
 import org.ensosurei.trophytrack.ui.components.CategoryChip
 import org.ensosurei.trophytrack.ui.components.GameCard
@@ -55,149 +57,176 @@ fun DashboardScreen(
     var currentScreen by remember {mutableIntStateOf(0)}
     var selectedCategoryIndex by remember { mutableIntStateOf(0) }
     val categories = listOf("All", "Steam", "PlayStation", "Xbox")
-    val currentPlatform = categories[selectedCategoryIndex]
     val playingGames by container.db.gameDao().getPlayingGames().collectAsState(initial = emptyList())
     val completedGames by container.db.gameDao().getCompletedGames().collectAsState(initial = emptyList())
-    val repository by lazy { container.gameRepository }
+    val repository = remember { container.gameRepository }
     var searchQuery by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
     var searchJob by remember { mutableStateOf<Job?>(null) }
     val querySql = "%${searchQuery}%"
     val filterGames by container.db.gameDao().searchGames(querySql).collectAsState(initial = emptyList())
+    var selectedGameForAdd by remember { mutableStateOf<GameEntity?>(null) }
 
     BarNavigation(
         currentStatus = currentScreen,
         onStatusChange = { newScreen -> currentScreen = newScreen},
-        onFabClick = {}
+        onFabClick = {
+            selectedGameForAdd = GameEntity(
+                id = 0,
+                coverUrl = "",
+                title = "",
+                hoursPlayed = 0f,
+                status = "PLAYING",
+                platforms = "",
+                origin = "MANUAL",
+                externalId = "",
+                addedAt = 0,
+                updateAt = 0
+            )
+        }
     ){
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ){
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-            ){
-                Row(
+            if (selectedGameForAdd != null) {
+
+                // Si hay un juego en el estado, pintamos el formulario sobreescribiendo la pantalla
+                AddGameScreen(
+                    game = selectedGameForAdd,
+                    gameDao = container.db.gameDao(),
+                    onBack = { selectedGameForAdd = null }, // Al volverlo nulo, se cierra sola
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, top = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    IconButton(
-                        onClick = {}
-                    ){
-                        Icon(vectorResource(Res.drawable.ic_profile),
-                            contentDescription = null)
-                    }
-                    Text(
-                        text = "Home",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = white
-                    )
-                    Icon(
-                        vectorResource(Res.drawable.ic_bell),
-                        contentDescription = null
-                    )
-                }
-                SearchBar(
-                    query = searchQuery,
-                    onQueryChange = {it ->
-                        searchQuery = it
-                        searchJob?.cancel()
-                        searchJob = scope.launch {
-                            delay(500)
-                            if (searchQuery.isNotEmpty()){
-                                repository.searchAndSyncGames(searchQuery)
-                            }
-                        }
-                    }
                 )
-                if(searchQuery.isEmpty()){
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(24.dp)
+
+            }else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 64.dp, top = 16.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ){
-                        item {
-                            LazyRow(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentPadding = PaddingValues(16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ){
-                                itemsIndexed(categories){ index, category ->
-                                    CategoryChip(
-                                        text = category,
-                                        isSelected = (selectedCategoryIndex == index),
-                                        onClick = {selectedCategoryIndex = index}
-                                    )
-                                }
-                            }
+                        IconButton(
+                            onClick = {}
+                        ){
+                            Icon(vectorResource(Res.drawable.ic_profile),
+                                contentDescription = null)
                         }
-
-                        item{
-                            Column {
-                                Text(
-                                    text = "Playing Now",
-                                    fontSize = 18.sp,
-                                    color = white,
-                                    modifier = Modifier.padding(start = 16.dp, bottom = 12.dp)
-                                )
-
-                                LazyRow(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentPadding = PaddingValues(horizontal = 16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                                ){
-                                    items(playingGames){ game ->
-                                        GameCard(gameTitle = game.title, imageUrl = "")
-                                    }
-                                }
-                            }
-                        }
-
-                        item {
-                            Column {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ){
-                                    Text(
-                                        text = "Recently Completed",
-                                        fontSize = 18.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = white
-                                    )
-                                    Text(
-                                        text = "See All",
-                                        fontSize = 18.sp,
-                                        color = gray
-                                    )
-                                }
-
-                                LazyRow(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentPadding = PaddingValues(horizontal = 16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                                ) {
-                                    items(completedGames){ game ->
-                                        GameMiniCard(gameEntity = game)
-                                    }
-                                }
-                            }
-                        }
+                        Text(
+                            text = "Home",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = white,
+                            modifier = Modifier
+                                .weight(1f),
+                            textAlign = TextAlign.Center
+                        )
                     }
-                }else {
-                    GamesGrid(
-                        modifier = Modifier.fillMaxWidth().weight(1f),
-                        gameList = filterGames
+                    SearchBar(
+                        query = searchQuery,
+                        onQueryChange = {it ->
+                            searchQuery = it
+                            searchJob?.cancel()
+                            searchJob = scope.launch {
+                                delay(500)
+                                if (searchQuery.isNotEmpty()){
+                                    repository.searchAndSyncGames(searchQuery)
+                                }
+                            }
+                        }
                     )
+                    if(searchQuery.isEmpty()){
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 80.dp),
+                            verticalArrangement = Arrangement.spacedBy(24.dp)
+                        ){
+                            item {
+                                LazyRow(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentPadding = PaddingValues(16.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ){
+                                    itemsIndexed(categories){ index, category ->
+                                        CategoryChip(
+                                            text = category,
+                                            isSelected = (selectedCategoryIndex == index),
+                                            onClick = {selectedCategoryIndex = index}
+                                        )
+                                    }
+                                }
+                            }
+
+                            item{
+                                Column {
+                                    Text(
+                                        text = "Playing Now",
+                                        fontSize = 18.sp,
+                                        color = white,
+                                        modifier = Modifier.padding(start = 16.dp, bottom = 12.dp)
+                                    )
+
+                                    LazyRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentPadding = PaddingValues(horizontal = 16.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                    ){
+                                        items(playingGames){ game ->
+                                            GameMiniCard(gameEntity = game, imageUrl = game.coverUrl)
+                                        }
+                                    }
+                                }
+                            }
+
+                            item {
+                                Column {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ){
+                                        Text(
+                                            text = "Completed",
+                                            fontSize = 18.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = white
+                                        )
+                                        Text(
+                                            text = "See All",
+                                            fontSize = 18.sp,
+                                            color = gray
+                                        )
+                                    }
+
+                                    LazyRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentPadding = PaddingValues(horizontal = 16.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                    ) {
+                                        items(completedGames){ game ->
+                                            GameMiniCard(gameEntity = game, imageUrl = game.coverUrl)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }else {
+                        GamesGrid(
+                            modifier = Modifier.fillMaxWidth().weight(1f),
+                            gameList = filterGames,
+                            onGameSelected = { game ->
+                                selectedGameForAdd = game
+                            }
+                        )
+                    }
                 }
             }
         }

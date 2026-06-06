@@ -10,6 +10,9 @@ interface GameDao {
     @Upsert
     suspend fun saveGames(game: List<GameEntity>)
 
+    @Upsert
+    suspend fun saveGame(game: GameEntity)
+
     @Query("SELECT * FROM GameEntity")
     fun getAllGames(): Flow<List<GameEntity>>
 

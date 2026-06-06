@@ -33,6 +33,7 @@ import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
 import trophytrack.shared.generated.resources.Res
 import trophytrack.shared.generated.resources.ic_play
+import trophytrack.shared.generated.resources.ic_plus
 
 @Composable
 fun GameCard(
@@ -77,7 +78,7 @@ fun GameCard(
                 Text(
                     text = gameTitle,
                     color = white,
-                    fontSize = 22.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -97,7 +98,7 @@ fun GameCard(
                     .background(purple, shape = CircleShape)
             ){
                 Icon(
-                    vectorResource(Res.drawable.ic_play),
+                    vectorResource(Res.drawable.ic_plus),
                     contentDescription = null
                 )
             }
