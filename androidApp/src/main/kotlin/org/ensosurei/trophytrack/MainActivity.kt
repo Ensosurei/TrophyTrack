@@ -13,6 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val container = (application as TrophyTrackApp).appContainer
 
+        enableEdgeToEdge()
         setContent {
             App(container = container)
         }

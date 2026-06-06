@@ -3,6 +3,7 @@ package org.ensosurei.trophytrack.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -33,7 +34,9 @@ fun GamesGrid(
         items(gameList){ game ->
             GameCard(
                 gameTitle = game.title,
-                imageUrl = game.coverUrl
+                imageUrl = game.coverUrl,
+                modifier = Modifier
+                    .fillMaxWidth()
             )
         }
     }
