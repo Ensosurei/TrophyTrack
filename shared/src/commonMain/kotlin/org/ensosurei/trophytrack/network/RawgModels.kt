@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RawgGameDto(
+    val id: Int,
     val name: String,
     val background_image: String?,
     val platforms: List<PlatformContainerDto>?
