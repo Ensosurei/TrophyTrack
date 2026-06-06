@@ -21,7 +21,8 @@ import org.ensosurei.trophytrack.ui.theme.white
 @Composable
 fun GamesGrid(
     modifier: Modifier = Modifier,
-    gameList : List<GameEntity>
+    gameList : List<GameEntity>,
+    onGameSelected: (GameEntity) -> Unit
 ){
     LazyVerticalGrid(
         columns = GridCells.Adaptive(140.dp),
@@ -36,7 +37,8 @@ fun GamesGrid(
                 gameTitle = game.title,
                 imageUrl = game.coverUrl,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                onPlayClick = {onGameSelected(game)}
             )
         }
     }

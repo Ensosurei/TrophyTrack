@@ -32,6 +32,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.ensosurei.trophytrack.AppContainer
+import org.ensosurei.trophytrack.database.GameEntity
 import org.ensosurei.trophytrack.ui.components.BarNavigation
 import org.ensosurei.trophytrack.ui.components.CategoryChip
 import org.ensosurei.trophytrack.ui.components.GameCard
@@ -64,6 +65,7 @@ fun DashboardScreen(
     var searchJob by remember { mutableStateOf<Job?>(null) }
     val querySql = "%${searchQuery}%"
     val filterGames by container.db.gameDao().searchGames(querySql).collectAsState(initial = emptyList())
+    var selectedGameForAdd by remember { mutableStateOf<GameEntity?>(null) }
 
     BarNavigation(
         currentStatus = currentScreen,
@@ -196,7 +198,11 @@ fun DashboardScreen(
                 }else {
                     GamesGrid(
                         modifier = Modifier.fillMaxWidth().weight(1f),
-                        gameList = filterGames
+                        gameList = filterGames,
+                        onGameSelected = { game ->
+                            selectedGameForAdd = game
+                            currentScreen = 3
+                        }
                     )
                 }
             }
