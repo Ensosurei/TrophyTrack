@@ -78,7 +78,7 @@ fun GameCard(
                 Text(
                     text = gameTitle,
                     color = white,
-                    fontSize = 22.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis

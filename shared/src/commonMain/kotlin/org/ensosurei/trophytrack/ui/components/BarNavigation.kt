@@ -111,10 +111,10 @@ fun BarNavigation(
                                 icon = {
                                     Icon(
                                         vectorResource(Res.drawable.ic_inbox),
-                                        contentDescription = "Activity"
+                                        contentDescription = "Notes"
                                     )
                                 },
-                                label = { Text("Activity") }
+                                label = { Text("Notes") }
                             )
 
                             NavigationBarItem(

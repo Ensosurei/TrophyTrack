@@ -1,0 +1,186 @@
+package org.ensosurei.trophytrack.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toLong
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
+import androidx.room.util.TableInfo
+import coil3.compose.AsyncImage
+import kotlinx.coroutines.launch
+import org.ensosurei.trophytrack.database.GameDao
+import org.ensosurei.trophytrack.database.GameEntity
+import org.ensosurei.trophytrack.ui.components.CategoryChip
+import org.ensosurei.trophytrack.ui.theme.surface
+import org.ensosurei.trophytrack.ui.theme.white
+import org.jetbrains.compose.resources.vectorResource
+import trophytrack.shared.generated.resources.Res
+import trophytrack.shared.generated.resources.ic_arrowBack
+import kotlin.time.Clock
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddGameScreen(
+    game: GameEntity?,
+    gameDao: GameDao,
+    onBack: () -> Unit,
+    modifier: Modifier
+){
+    var titleText by remember { mutableStateOf(game?.title ?: "") }
+    var coverUrlText by remember { mutableStateOf(game?.coverUrl ?: "") }
+    var hoursText by remember { mutableStateOf("0.0") }
+    var selectedStatus by remember { mutableStateOf("PLAYING") }
+
+    val scope = rememberCoroutineScope()
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = surface)
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                onClick = onBack
+            ){
+                Icon(
+                    imageVector = vectorResource(Res.drawable.ic_arrowBack),
+                    contentDescription = null,
+                    tint = white
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = "Add to Collection",
+                style = MaterialTheme.typography.titleLarge,
+                color = white
+            )
+        }
+
+        if (coverUrlText.isNotEmpty()){
+            Card(
+                modifier = Modifier
+                    .width(180.dp)
+                    .height(240.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ){
+                AsyncImage(
+                    model = coverUrlText,
+                    contentDescription = " Game Cover",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                )
+            }
+        }
+
+        OutlinedTextField(
+            value = titleText,
+            onValueChange = {titleText = it},
+            label = { Text("Game title")},
+            modifier = Modifier
+                .fillMaxWidth(),
+            singleLine = true
+        )
+
+        OutlinedTextField(
+            value = hoursText,
+            onValueChange = { hoursText = it },
+            label = { Text("Played Hours") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
+        )
+
+        Text(
+            text = "Select a status",
+            style = MaterialTheme.typography.bodyMedium,
+            color = white,
+            modifier = Modifier
+                .fillMaxWidth()
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            CategoryChip(
+                text = "Playing Now",
+                isSelected = selectedStatus == "PLAYING",
+                onClick = {selectedStatus = "PLAYING"},
+                modifier = Modifier
+                    .weight(1f)
+            )
+            CategoryChip(
+                text = "Completed",
+                isSelected = selectedStatus == "COMPLETED",
+                onClick = {selectedStatus = "COMPLETED"},
+                modifier = Modifier
+                    .weight(1f)
+            )
+        }
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = {
+                val hours = hoursText.toFloatOrNull() ?: 0f;
+                val actualTime = Clock.System.now().toEpochMilliseconds()
+                val updateDate = game?.addedAt ?: actualTime
+                val updatedGame = GameEntity(
+                    id = game?.id ?: 0,
+                    coverUrl = coverUrlText,
+                    title = titleText,
+                    hoursPlayed = hours,
+                    status = selectedStatus,
+                    platforms = game?.platforms ?: "",
+                    origin = game?.origin ?: "RAWG",
+                    externalId = game?.externalId ?: "",
+                    addedAt = updateDate,
+                    updateAt = actualTime
+                )
+                scope.launch {
+                    gameDao.saveGame(updatedGame)
+                    onBack()
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+        ){
+            Text("Save Collection")
+        }
+    }
+}
