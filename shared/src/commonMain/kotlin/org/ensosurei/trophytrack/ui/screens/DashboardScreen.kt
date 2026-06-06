@@ -22,11 +22,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.ensosurei.trophytrack.AppContainer
 import org.ensosurei.trophytrack.ui.components.BarNavigation
 import org.ensosurei.trophytrack.ui.components.CategoryChip
@@ -54,7 +58,10 @@ fun DashboardScreen(
     val currentPlatform = categories[selectedCategoryIndex]
     val playingGames by container.db.gameDao().getPlayingGames().collectAsState(initial = emptyList())
     val completedGames by container.db.gameDao().getCompletedGames().collectAsState(initial = emptyList())
+    val repository by lazy { container.gameRepository }
     var searchQuery by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    var searchJob by remember { mutableStateOf<Job?>(null) }
     val querySql = "%${searchQuery}%"
     val filterGames by container.db.gameDao().searchGames(querySql).collectAsState(initial = emptyList())
 
@@ -98,7 +105,16 @@ fun DashboardScreen(
                 }
                 SearchBar(
                     query = searchQuery,
-                    onQueryChange = {searchQuery = it}
+                    onQueryChange = {it ->
+                        searchQuery = it
+                        searchJob?.cancel()
+                        searchJob = scope.launch {
+                            delay(500)
+                            if (searchQuery.isNotEmpty()){
+                                repository.searchAndSyncGames(searchQuery)
+                            }
+                        }
+                    }
                 )
                 if(searchQuery.isEmpty()){
                     LazyColumn(

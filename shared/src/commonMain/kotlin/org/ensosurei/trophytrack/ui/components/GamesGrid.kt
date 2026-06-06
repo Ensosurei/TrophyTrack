@@ -33,7 +33,7 @@ fun GamesGrid(
         items(gameList){ game ->
             GameCard(
                 gameTitle = game.title,
-                imageUrl = ""
+                imageUrl = game.coverUrl
             )
         }
     }
