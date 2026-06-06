@@ -14,6 +14,7 @@ dependencies {
 
     implementation(libs.compose.uiToolingPreview)
     implementation(libs.room.runtime)
+    implementation(libs.ktor.client.okhttp)
 }
 
 compose.desktop {
