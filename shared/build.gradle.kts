@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
@@ -54,6 +56,9 @@ kotlin {
             implementation(libs.coil.network.ktor3)
 
             implementation(libs.ktor.client.core)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.content.negotiation)
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
