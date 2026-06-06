@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.ensosurei.trophytrack.ui.theme.gray
 import org.ensosurei.trophytrack.ui.theme.pink
+import org.ensosurei.trophytrack.ui.theme.purple
 import org.ensosurei.trophytrack.ui.theme.white
 
 @Composable
@@ -55,7 +56,7 @@ fun CategoryChip(
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = text,
-            color = if(isSelected) white else gray,
+            color = if(isSelected) pink else gray,
             fontSize = 16.sp,
             fontWeight = if(isSelected) FontWeight.Bold else FontWeight.Normal
         )

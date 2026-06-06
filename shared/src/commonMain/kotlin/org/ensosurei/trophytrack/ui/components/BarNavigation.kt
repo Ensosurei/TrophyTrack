@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -82,7 +83,7 @@ fun BarNavigation(
                                         contentDescription = "Home"
                                     )
                                 },
-                                label = { Text("Home") },
+                                label = { Text("Home") }
                             )
 
                             NavigationBarItem(
