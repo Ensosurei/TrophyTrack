@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GameDao {
     @Upsert
-    suspend fun saveGame(game: GameEntity)
+    suspend fun saveGames(game: List<GameEntity>)
 
     @Query("SELECT * FROM GameEntity")
     fun getAllGames(): Flow<List<GameEntity>>
