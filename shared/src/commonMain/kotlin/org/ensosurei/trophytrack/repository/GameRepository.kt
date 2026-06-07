@@ -17,7 +17,7 @@ class GameRepository(
                id = it.id,
                title = it.name,
                coverUrl = it.background_image ?: "",
-               platforms = "PC",
+               platforms = it.platforms?.joinToString(separator = ", ") { platformDto -> platformDto.platform.name } ?: "PC",
                origin = "RAWG",
                externalId = null,
                hoursPlayed = 0.0f,

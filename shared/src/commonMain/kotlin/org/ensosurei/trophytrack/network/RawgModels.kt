@@ -8,7 +8,8 @@ data class RawgGameDto(
     val name: String,
     val background_image: String?,
     val platforms: List<PlatformContainerDto>?
-)
+){
+}
 
 @Serializable
 data class GameSearchResponse(
@@ -23,5 +24,4 @@ data class PlatformContainerDto(
 data class RawgPlatformDto(
     val name: String
 )
-
 
