@@ -61,6 +61,7 @@ fun AddGameScreen(
     game: GameEntity?,
     gameDao: GameDao,
     onBack: () -> Unit,
+    onSaveSuccess: () -> Unit,
     modifier: Modifier
 ) {
     var titleText by remember { mutableStateOf(game?.title ?: "") }
@@ -260,7 +261,7 @@ fun AddGameScreen(
                 )
                 scope.launch {
                     gameDao.saveGame(updatedGame)
-                    onBack()
+                    onSaveSuccess()
                 }
             },
             modifier = Modifier

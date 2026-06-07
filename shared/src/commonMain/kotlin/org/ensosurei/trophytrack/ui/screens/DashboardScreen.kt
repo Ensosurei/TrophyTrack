@@ -97,7 +97,11 @@ fun DashboardScreen(
                 AddGameScreen(
                     game = selectedGameForAdd,
                     gameDao = container.db.gameDao(),
-                    onBack = { selectedGameForAdd = null },
+                    onBack = { selectedGameForAdd = null},
+                    onSaveSuccess = {
+                        selectedGameForAdd = null
+                        searchQuery = ""
+                    },
                     modifier = Modifier.padding(paddingValues).fillMaxSize()
                 )
 
