@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.room.util.TableInfo
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
@@ -67,6 +68,7 @@ fun AddGameScreen(
     var hoursText by remember { mutableStateOf("0.0") }
     var selectedStatus by remember { mutableStateOf("PLAYING") }
     var showUrlInput by remember { mutableStateOf(false) }
+    var selectedPlatforms by remember { mutableStateOf(setOf<String>()) }
 
     val scope = rememberCoroutineScope()
 
@@ -171,6 +173,39 @@ fun AddGameScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
         )
 
+        if(game?.origin == "MANUAL"){
+            Text(
+                text = "Platforms",
+                color = white,
+                fontSize = 16.sp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ){
+                val availablePlatforms = listOf("PC", "Playstation", "Xbox")
+                availablePlatforms.forEach { platform ->
+                   val isSelected = selectedPlatforms.contains(platform)
+                    CategoryChip(
+                        text = platform,
+                        isSelected = isSelected,
+                        onClick = {
+                            selectedPlatforms = if(isSelected){
+                                selectedPlatforms - platform
+                            }else{
+                                selectedPlatforms + platform
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
         Text(
             text = "Select a status",
             style = MaterialTheme.typography.bodyMedium,
@@ -202,6 +237,12 @@ fun AddGameScreen(
 
         Button(
             onClick = {
+                val finalPlatforms = if(game?.origin == "MANUAL"){
+                    if(selectedPlatforms.isEmpty()) "PC" else selectedPlatforms.joinToString(", ")
+                }else{
+                    game?.platforms
+                }
+
                 val hours = hoursText.toFloatOrNull() ?: 0f;
                 val actualTime = Clock.System.now().toEpochMilliseconds()
                 val updateDate = game?.addedAt ?: actualTime
@@ -211,7 +252,7 @@ fun AddGameScreen(
                     title = titleText,
                     hoursPlayed = hours,
                     status = selectedStatus,
-                    platforms = game?.platforms ?: "",
+                    platforms = finalPlatforms ?: "",
                     origin = game?.origin ?: "RAWG",
                     externalId = game?.externalId ?: "",
                     addedAt = updateDate,

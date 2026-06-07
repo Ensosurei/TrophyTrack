@@ -80,6 +80,14 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
+
+    targets.all {
+        compilations.all {
+            compilerOptions.configure {
+                freeCompilerArgs.add("-Xexpect-actual-classes")
+            }
+        }
+    }
 }
 
 buildkonfig {
