@@ -1,7 +1,9 @@
 package org.ensosurei.trophytrack.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,8 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -30,7 +35,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.toLong
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.room.util.TableInfo
 import coil3.compose.AsyncImage
@@ -38,11 +45,13 @@ import kotlinx.coroutines.launch
 import org.ensosurei.trophytrack.database.GameDao
 import org.ensosurei.trophytrack.database.GameEntity
 import org.ensosurei.trophytrack.ui.components.CategoryChip
+import org.ensosurei.trophytrack.ui.theme.gray
 import org.ensosurei.trophytrack.ui.theme.surface
 import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
 import trophytrack.shared.generated.resources.Res
 import trophytrack.shared.generated.resources.ic_arrowBack
+import trophytrack.shared.generated.resources.ic_camera
 import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,11 +61,12 @@ fun AddGameScreen(
     gameDao: GameDao,
     onBack: () -> Unit,
     modifier: Modifier
-){
+) {
     var titleText by remember { mutableStateOf(game?.title ?: "") }
     var coverUrlText by remember { mutableStateOf(game?.coverUrl ?: "") }
     var hoursText by remember { mutableStateOf("0.0") }
     var selectedStatus by remember { mutableStateOf("PLAYING") }
+    var showUrlInput by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -68,7 +78,7 @@ fun AddGameScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
+    ){
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -76,7 +86,7 @@ fun AddGameScreen(
         ) {
             IconButton(
                 onClick = onBack
-            ){
+            ) {
                 Icon(
                     imageVector = vectorResource(Res.drawable.ic_arrowBack),
                     contentDescription = null,
@@ -91,13 +101,13 @@ fun AddGameScreen(
             )
         }
 
-        if (coverUrlText.isNotEmpty()){
+        if (coverUrlText.isNotEmpty()) {
             Card(
                 modifier = Modifier
                     .width(180.dp)
                     .height(240.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ){
+            ) {
                 AsyncImage(
                     model = coverUrlText,
                     contentDescription = " Game Cover",
@@ -106,12 +116,43 @@ fun AddGameScreen(
                         .fillMaxSize()
                 )
             }
+        } else {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(140.dp, 200.dp)
+                        .background(Color.DarkGray, shape = RoundedCornerShape(8.dp))
+                        .clickable { showUrlInput = !showUrlInput },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = vectorResource(Res.drawable.ic_camera),
+                            contentDescription = null
+                        )
+                        Text("Upload Image", color = gray)
+                    }
+                }
+                if (showUrlInput) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = coverUrlText,
+                        onValueChange = { coverUrlText = it },
+                        label = { Text("Pegar URL de la imagen") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
 
         OutlinedTextField(
             value = titleText,
-            onValueChange = {titleText = it},
-            label = { Text("Game title")},
+            onValueChange = { titleText = it },
+            label = { Text("Game title") },
             modifier = Modifier
                 .fillMaxWidth(),
             singleLine = true
@@ -119,10 +160,15 @@ fun AddGameScreen(
 
         OutlinedTextField(
             value = hoursText,
-            onValueChange = { hoursText = it },
+            onValueChange = { newText ->
+                if (newText.all { it.isDigit() || it == '.' } && newText.count { it == '.' } <= 1) {
+                    hoursText = newText
+                }
+            },
             label = { Text("Played Hours") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
         )
 
         Text(
@@ -140,14 +186,14 @@ fun AddGameScreen(
             CategoryChip(
                 text = "Playing Now",
                 isSelected = selectedStatus == "PLAYING",
-                onClick = {selectedStatus = "PLAYING"},
+                onClick = { selectedStatus = "PLAYING" },
                 modifier = Modifier
                     .weight(1f)
             )
             CategoryChip(
                 text = "Completed",
                 isSelected = selectedStatus == "COMPLETED",
-                onClick = {selectedStatus = "COMPLETED"},
+                onClick = { selectedStatus = "COMPLETED" },
                 modifier = Modifier
                     .weight(1f)
             )
@@ -179,7 +225,7 @@ fun AddGameScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
-        ){
+        ) {
             Text("Save Collection")
         }
     }

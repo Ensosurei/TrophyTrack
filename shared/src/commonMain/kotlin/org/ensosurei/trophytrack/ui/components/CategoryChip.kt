@@ -48,12 +48,6 @@ fun CategoryChip(
             }
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ){
-        Box(
-            modifier = Modifier
-                .size(6.dp)
-                .background(color = if(isSelected) pink else Color.Transparent, shape = CircleShape)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = text,
             color = if(isSelected) pink else gray,

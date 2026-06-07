@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -83,7 +85,8 @@ fun DashboardScreen(
                 addedAt = 0,
                 updateAt = 0
             )
-        }
+        },
+        showFab = (selectedGameForAdd == null)
     ){
         Box(
             modifier = Modifier
@@ -91,16 +94,15 @@ fun DashboardScreen(
                 .padding(paddingValues)
         ){
             if (selectedGameForAdd != null) {
-
-                // Si hay un juego en el estado, pintamos el formulario sobreescribiendo la pantalla
                 AddGameScreen(
                     game = selectedGameForAdd,
                     gameDao = container.db.gameDao(),
-                    onBack = { selectedGameForAdd = null }, // Al volverlo nulo, se cierra sola
-                    modifier = Modifier
+                    onBack = { selectedGameForAdd = null },
+                    modifier = Modifier.padding(paddingValues).fillMaxSize()
                 )
 
-            }else {
+            }
+            else {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -178,7 +180,11 @@ fun DashboardScreen(
                                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                                     ){
                                         items(playingGames){ game ->
-                                            GameMiniCard(gameEntity = game, imageUrl = game.coverUrl)
+                                            GameMiniCard(gameEntity = game, imageUrl = game.coverUrl,
+                                                modifier = Modifier
+                                                    .width(120.dp)
+                                                    .height(175.dp)
+                                            )
                                         }
                                     }
                                 }
@@ -212,7 +218,11 @@ fun DashboardScreen(
                                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                                     ) {
                                         items(completedGames){ game ->
-                                            GameMiniCard(gameEntity = game, imageUrl = game.coverUrl)
+                                            GameMiniCard(gameEntity = game, imageUrl = game.coverUrl,
+                                                modifier = Modifier
+                                                    .width(120.dp)
+                                                    .height(175.dp)
+                                            )
                                         }
                                     }
                                 }
