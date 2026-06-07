@@ -47,7 +47,8 @@ fun BarNavigation(
     currentStatus: Int,
     onStatusChange: (Int) -> Unit,
     onFabClick: () -> Unit,
-    content: @Composable (PaddingValues) -> Unit
+    showFab: Boolean,
+    content: @Composable (PaddingValues) -> Unit,
 ){
     Scaffold(
         bottomBar = {
@@ -131,23 +132,24 @@ fun BarNavigation(
                         }
                     }
                 }
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .offset(y = (-24).dp)
-                        .shadow(elevation = 8.dp, shape = CircleShape)
-                        .size(64.dp)
-                        .background(purple, shape = CircleShape)
-                        .clickable {onFabClick()},
-                ){
-                    Icon(
+                if(showFab){
+                    Box(
                         modifier = Modifier
-                            .size(28.dp)
-                            .align(Alignment.Center),
-                        imageVector = vectorResource(Res.drawable.ic_plus),
-                        contentDescription = null
-                    )
+                            .align(Alignment.TopCenter)
+                            .offset(y = (-24).dp)
+                            .shadow(elevation = 8.dp, shape = CircleShape)
+                            .size(64.dp)
+                            .background(purple, shape = CircleShape)
+                            .clickable {onFabClick()},
+                    ){
+                        Icon(
+                            modifier = Modifier
+                                .size(28.dp)
+                                .align(Alignment.Center),
+                            imageVector = vectorResource(Res.drawable.ic_plus),
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }
