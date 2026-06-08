@@ -70,6 +70,7 @@ fun AddGameScreen(
     var selectedStatus by remember { mutableStateOf("PLAYING") }
     var showUrlInput by remember { mutableStateOf(false) }
     var selectedPlatforms by remember { mutableStateOf(setOf<String>()) }
+    var localImageBytes by remember { mutableStateOf<ByteArray?>(null) }
 
     val scope = rememberCoroutineScope()
 

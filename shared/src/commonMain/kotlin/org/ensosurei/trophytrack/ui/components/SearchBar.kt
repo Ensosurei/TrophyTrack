@@ -27,6 +27,7 @@ import trophytrack.shared.generated.resources.ic_search
 fun SearchBar(
     modifier: Modifier = Modifier,
     query: String,
+    onFilterClick: () -> Unit,
     onQueryChange: (String) -> Unit
 ){
     Row(
@@ -55,7 +56,7 @@ fun SearchBar(
         )
 
         IconButton(
-            onClick = {},
+            onClick = onFilterClick,
             modifier = Modifier.padding(start = 8.dp)
                 .background(color = surface, shape = RoundedCornerShape(16.dp)),
         ){

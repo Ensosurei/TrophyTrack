@@ -68,6 +68,7 @@ fun DashboardScreen(
     val querySql = "%${searchQuery}%"
     val filterGames by container.db.gameDao().searchGames(querySql).collectAsState(initial = emptyList())
     var selectedGameForAdd by remember { mutableStateOf<GameEntity?>(null) }
+    var showFilters by remember { mutableStateOf(false) }
 
     BarNavigation(
         currentStatus = currentScreen,
@@ -145,7 +146,8 @@ fun DashboardScreen(
                                     repository.searchAndSyncGames(searchQuery)
                                 }
                             }
-                        }
+                        },
+                        onFilterClick = {showFilters = !showFilters}
                     )
                     if(searchQuery.isEmpty()){
                         LazyColumn(
@@ -154,17 +156,19 @@ fun DashboardScreen(
                             verticalArrangement = Arrangement.spacedBy(24.dp)
                         ){
                             item {
-                                LazyRow(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentPadding = PaddingValues(16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ){
-                                    itemsIndexed(categories){ index, category ->
-                                        CategoryChip(
-                                            text = category,
-                                            isSelected = (selectedCategoryIndex == index),
-                                            onClick = {selectedCategoryIndex = index}
-                                        )
+                                if(showFilters){
+                                    LazyRow(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentPadding = PaddingValues(16.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ){
+                                        itemsIndexed(categories){ index, category ->
+                                            CategoryChip(
+                                                text = category,
+                                                isSelected = (selectedCategoryIndex == index),
+                                                onClick = {selectedCategoryIndex = index}
+                                            )
+                                        }
                                     }
                                 }
                             }
