@@ -72,6 +72,8 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
 
             implementation(libs.filekit.compose)
+
+            implementation(libs.kotlinx.datetime)
         }
 
         val jvmMain by getting {
