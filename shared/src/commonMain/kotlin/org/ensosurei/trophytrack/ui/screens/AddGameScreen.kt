@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.room.util.TableInfo
 import coil3.compose.AsyncImage
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import org.ensosurei.trophytrack.database.GameDao
 import org.ensosurei.trophytrack.database.GameEntity
@@ -66,17 +69,25 @@ fun AddGameScreen(
 ) {
     var titleText by remember { mutableStateOf(game?.title ?: "") }
     var coverUrlText by remember { mutableStateOf(game?.coverUrl ?: "") }
-    var hoursText by remember { mutableStateOf("0.0") }
+    var hoursText by remember { mutableStateOf(game?.hoursPlayed?.toString() ?: "0") }
     var selectedStatus by remember { mutableStateOf("PLAYING") }
-    var showUrlInput by remember { mutableStateOf(false) }
-    var selectedPlatforms by remember { mutableStateOf(setOf<String>()) }
+    var selectedPlatforms by remember { mutableStateOf(
+        game?.platforms?.split(", ")?.filter { it.isNotEmpty() }?.toSet() ?: setOf()
+    ) }
     var localImageBytes by remember { mutableStateOf<ByteArray?>(null) }
-
     val scope = rememberCoroutineScope()
+    val launcher = rememberFilePickerLauncher(type = PickerType.Image){ file ->
+        if(file != null){
+            scope.launch {
+                localImageBytes = file.readBytes()
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight()
             .background(color = surface)
             .padding(16.dp)
             .verticalScroll(rememberScrollState()),
@@ -97,58 +108,79 @@ fun AddGameScreen(
                     tint = white
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "Add to Collection",
                 style = MaterialTheme.typography.titleLarge,
                 color = white
             )
         }
-
-        if (coverUrlText.isNotEmpty()) {
+        if(localImageBytes != null){
             Card(
                 modifier = Modifier
                     .width(180.dp)
-                    .height(240.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    .height(240.dp)
+                    .clickable{launcher.launch()},
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 AsyncImage(
-                    model = coverUrlText,
-                    contentDescription = " Game Cover",
+                    model = localImageBytes,
+                    contentDescription = "New Local Cover",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                 )
             }
-        } else {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+        } else if(coverUrlText.isNotEmpty()) {
+            Card(
+                modifier = Modifier
+                    .width(180.dp)
+                    .height(240.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            ){
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable{launcher.launch()}
+                ){
+                    AsyncImage(
+                        model = coverUrlText,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                    )
+                }
+            }
+        }
+        else {
+            Card(
+                modifier = Modifier
+                    .width(180.dp)
+                    .height(240.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(140.dp, 200.dp)
-                        .background(Color.DarkGray, shape = RoundedCornerShape(8.dp))
-                        .clickable { showUrlInput = !showUrlInput },
+                        .fillMaxSize()
+                        .background(Color.DarkGray)
+                        .clickable { launcher.launch() },
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
                             imageVector = vectorResource(Res.drawable.ic_camera),
                             contentDescription = null
                         )
-                        Text("Upload Image", color = gray)
+                        Text(
+                            "Upload Image",
+                            color = white,
+                            fontSize = 14.sp
+                        )
                     }
-                }
-                if (showUrlInput) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = coverUrlText,
-                        onValueChange = { coverUrlText = it },
-                        label = { Text("Pegar URL de la imagen") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
                 }
             }
         }
@@ -175,7 +207,7 @@ fun AddGameScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
         )
 
-        if(game?.origin == "MANUAL"){
+        if ((game?.origin ?: "MANUAL") == "MANUAL"){
             Text(
                 text = "Platforms",
                 color = white,
@@ -235,14 +267,20 @@ fun AddGameScreen(
                     .weight(1f)
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             onClick = {
+                var finalCover = coverUrlText
                 val finalPlatforms = if(game?.origin == "MANUAL"){
                     if(selectedPlatforms.isEmpty()) "PC" else selectedPlatforms.joinToString(", ")
                 }else{
                     game?.platforms
+                }
+                if(localImageBytes != null){
+                   val savedPath = saveImageLocalStorage(localImageBytes!!)
+                    finalCover = savedPath
+                    coverUrlText = savedPath
                 }
 
                 val hours = hoursText.toFloatOrNull() ?: 0f;
@@ -250,7 +288,7 @@ fun AddGameScreen(
                 val updateDate = game?.addedAt ?: actualTime
                 val updatedGame = GameEntity(
                     id = game?.id ?: 0,
-                    coverUrl = coverUrlText,
+                    coverUrl = finalCover,
                     title = titleText,
                     hoursPlayed = hours,
                     status = selectedStatus,
@@ -271,5 +309,14 @@ fun AddGameScreen(
         ) {
             Text("Save Collection")
         }
+        Spacer(modifier = Modifier.height(50.dp))
     }
+}
+
+fun saveImageLocalStorage(bytes: ByteArray): String {
+    val fileName = "cover_${System.currentTimeMillis()}.png"
+    val tmpdir = System.getProperty("java.io.tmpdir") ?: "."
+    val targetFile = java.io.File(tmpdir,fileName)
+    targetFile.writeBytes(bytes)
+    return targetFile.absolutePath
 }
