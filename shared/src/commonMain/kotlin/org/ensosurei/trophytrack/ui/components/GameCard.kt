@@ -27,8 +27,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import org.ensosurei.trophytrack.ui.theme.purple
 import org.ensosurei.trophytrack.ui.theme.surface
+import org.ensosurei.trophytrack.ui.theme.surfaceVariant
 import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
 import trophytrack.shared.generated.resources.Res
@@ -88,14 +88,14 @@ fun GameCard(
             IconButton(
                 onClick = onPlayClick,
                 colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = purple,
+                    containerColor = surfaceVariant,
                     contentColor = white
                 ),
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 16.dp)
                     .size(48.dp)
-                    .background(purple, shape = CircleShape)
+                    .background(surfaceVariant, shape = CircleShape)
             ){
                 Icon(
                     vectorResource(Res.drawable.ic_plus),

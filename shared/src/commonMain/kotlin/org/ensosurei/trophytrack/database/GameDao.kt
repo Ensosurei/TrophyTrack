@@ -1,6 +1,7 @@
 package org.ensosurei.trophytrack.database
 
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
@@ -12,6 +13,9 @@ interface GameDao {
 
     @Upsert
     suspend fun saveGame(game: GameEntity)
+
+    @Insert
+    suspend fun insertGame(game: GameEntity)
 
     @Query("SELECT * FROM GameEntity")
     fun getAllGames(): Flow<List<GameEntity>>

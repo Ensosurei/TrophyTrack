@@ -15,6 +15,7 @@ class TrophyTrackApp : Application(){
         val apiClient = RawgApiClient()
         val gameRepository = GameRepository(apiClient = apiClient, gameDao = gameDao)
 
+
         AppContainer(store,builder, gameRepository)
     }
 }

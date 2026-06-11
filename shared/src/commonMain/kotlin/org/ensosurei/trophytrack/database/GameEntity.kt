@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class GameEntity(
-    @PrimaryKey val id : Int,
+    @PrimaryKey(autoGenerate = true) val id : Int,
     val title : String,
     val coverUrl : String,
     val platforms : String,

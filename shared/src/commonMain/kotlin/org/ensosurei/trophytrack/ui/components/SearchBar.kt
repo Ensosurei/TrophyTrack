@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.ensosurei.trophytrack.ui.theme.purple
+import org.ensosurei.trophytrack.ui.theme.pink
 import org.ensosurei.trophytrack.ui.theme.surface
 import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
@@ -50,7 +50,7 @@ fun SearchBar(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = surface,
                 unfocusedContainerColor = surface,
-                focusedBorderColor = purple,
+                focusedBorderColor = pink,
                 unfocusedBorderColor = white.copy(alpha = 0.5f)
             )
         )

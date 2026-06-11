@@ -9,14 +9,14 @@ import org.ensosurei.trophytrack.preferences.DataStoreFactory
 import org.ensosurei.trophytrack.repository.GameRepository
 
 fun main() = application {
-    val dataBuiler = DatabaseBuilder()
+    val dataBuilder = DatabaseBuilder()
     val store = DataStoreFactory()
-    val database = dataBuiler.createBuilder().build()
+    val database = dataBuilder.createBuilder().build()
     val gameDao = database.gameDao()
     val apiClient = RawgApiClient()
     val gameRepository = GameRepository(apiClient = apiClient, gameDao = gameDao)
 
-    val appContainer = AppContainer(store,dataBuiler, gameRepository)
+    val appContainer = AppContainer(store,dataBuilder, gameRepository)
     Window(
         onCloseRequest = ::exitApplication,
         title = "TrophyTrack",

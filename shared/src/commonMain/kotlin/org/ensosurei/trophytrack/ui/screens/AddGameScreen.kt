@@ -28,6 +28,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +47,7 @@ import androidx.room.util.TableInfo
 import coil3.compose.AsyncImage
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.ensosurei.trophytrack.database.GameDao
 import org.ensosurei.trophytrack.database.GameEntity
@@ -61,25 +64,42 @@ import kotlin.time.Clock
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddGameScreen(
-    game: GameEntity?,
+    gameId: Int,
     gameDao: GameDao,
     onBack: () -> Unit,
     onSaveSuccess: () -> Unit,
     modifier: Modifier
 ) {
-    var titleText by remember { mutableStateOf(game?.title ?: "") }
-    var coverUrlText by remember { mutableStateOf(game?.coverUrl ?: "") }
-    var hoursText by remember { mutableStateOf(game?.hoursPlayed?.toString() ?: "0") }
+    val gameFromDbFlow = remember(gameId) {
+        gameDao.getAllGames().map { list -> list.find { it.id == gameId } }
+    }
+    val gameFromDb by gameFromDbFlow.collectAsState(initial = null)
+
+    var titleText by remember { mutableStateOf("") }
+    var coverUrlText by remember { mutableStateOf("") }
+    var hoursText by remember { mutableStateOf("0") }
     var selectedStatus by remember { mutableStateOf("PLAYING") }
-    var selectedPlatforms by remember { mutableStateOf(
-        game?.platforms?.split(", ")?.filter { it.isNotEmpty() }?.toSet() ?: setOf()
-    ) }
+    var selectedPlatforms by remember { mutableStateOf(setOf<String>()) }
     var localImageBytes by remember { mutableStateOf<ByteArray?>(null) }
+    val isNewGame = remember { gameId == -1 }
+
     val scope = rememberCoroutineScope()
     val launcher = rememberFilePickerLauncher(type = PickerType.Image){ file ->
         if(file != null){
             scope.launch {
                 localImageBytes = file.readBytes()
+            }
+        }
+    }
+
+    LaunchedEffect(gameFromDb){
+        if (gameId != -1) {
+            gameFromDb?.let { game ->
+                titleText = game.title
+                coverUrlText = game.coverUrl
+                hoursText = game.hoursPlayed.toString()
+                selectedStatus = game.status
+                selectedPlatforms = game.platforms.split(", ").filter { it.isNotEmpty() }.toSet()
             }
         }
     }
@@ -207,7 +227,7 @@ fun AddGameScreen(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
         )
 
-        if ((game?.origin ?: "MANUAL") == "MANUAL"){
+        if (isNewGame || (gameFromDb?.origin ?: "MANUAL") == "MANUAL"){
             Text(
                 text = "Platforms",
                 color = white,
@@ -272,10 +292,10 @@ fun AddGameScreen(
         Button(
             onClick = {
                 var finalCover = coverUrlText
-                val finalPlatforms = if(game?.origin == "MANUAL"){
-                    if(selectedPlatforms.isEmpty()) "PC" else selectedPlatforms.joinToString(", ")
-                }else{
-                    game?.platforms
+                val finalPlatforms = if (gameId == -1 || gameFromDb?.origin == "MANUAL") {
+                    if (selectedPlatforms.isEmpty()) "PC" else selectedPlatforms.joinToString(", ")
+                } else {
+                    gameFromDb?.platforms
                 }
                 if(localImageBytes != null){
                    val savedPath = saveImageLocalStorage(localImageBytes!!)
@@ -285,21 +305,25 @@ fun AddGameScreen(
 
                 val hours = hoursText.toFloatOrNull() ?: 0f;
                 val actualTime = Clock.System.now().toEpochMilliseconds()
-                val updateDate = game?.addedAt ?: actualTime
+                val updateDate = if (isNewGame) actualTime else (gameFromDb?.addedAt ?: actualTime)
                 val updatedGame = GameEntity(
-                    id = game?.id ?: 0,
+                    id = if (isNewGame) 0 else gameId,
                     coverUrl = finalCover,
                     title = titleText,
                     hoursPlayed = hours,
                     status = selectedStatus,
                     platforms = finalPlatforms ?: "",
-                    origin = game?.origin ?: "RAWG",
-                    externalId = game?.externalId ?: "",
+                    origin = if (gameId == -1) "MANUAL" else (gameFromDb?.origin ?: "MANUAL"),
+                    externalId = if (gameId == -1) "" else (gameFromDb?.externalId ?: ""),
                     addedAt = updateDate,
                     updateAt = actualTime
                 )
                 scope.launch {
-                    gameDao.saveGame(updatedGame)
+                    if (isNewGame) {
+                        gameDao.insertGame(updatedGame)
+                    } else {
+                        gameDao.saveGame(updatedGame)
+                    }
                     onSaveSuccess()
                 }
             },

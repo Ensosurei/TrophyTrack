@@ -31,7 +31,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import org.ensosurei.trophytrack.ui.theme.pink
-import org.ensosurei.trophytrack.ui.theme.purple
 import org.ensosurei.trophytrack.ui.theme.surface
 import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
@@ -139,7 +138,7 @@ fun BarNavigation(
                             .offset(y = (-24).dp)
                             .shadow(elevation = 8.dp, shape = CircleShape)
                             .size(64.dp)
-                            .background(purple, shape = CircleShape)
+                            .background(pink, shape = CircleShape)
                             .clickable {onFabClick()},
                     ){
                         Icon(

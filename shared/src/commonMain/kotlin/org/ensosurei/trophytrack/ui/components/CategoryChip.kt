@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.ensosurei.trophytrack.ui.theme.gray
 import org.ensosurei.trophytrack.ui.theme.pink
-import org.ensosurei.trophytrack.ui.theme.purple
 import org.ensosurei.trophytrack.ui.theme.white
 
 @Composable
