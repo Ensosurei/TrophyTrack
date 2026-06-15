@@ -28,4 +28,13 @@ interface GameDao {
 
     @Query("SELECT * FROM GameEntity WHERE title LIKE :searchQuery")
     fun searchGames(searchQuery: String): Flow<List<GameEntity>>
+
+    @Query("SELECT * FROM GameEntity WHERE id=:gameId")
+    fun getGameById(gameId: Int): GameEntity?
+
+    @Query("DELETE FROM GameEntity WHERE id=:gameId")
+    fun deleteGameById(gameId: Int)
+
+    @Query("UPDATE GameEntity SET status=:newStatus WHERE id=:gameId")
+    suspend fun updateGameStatus(gameId: Int, newStatus: String)
 }
