@@ -1,17 +1,20 @@
 package org.ensosurei.trophytrack.ui.screens
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import androidx.savedstate.read
+import androidx.navigation.toRoute
+import kotlinx.serialization.Serializable
 import org.ensosurei.trophytrack.AppContainer
+import org.ensosurei.trophytrack.database.GameEntity
 
 @Composable
 fun AppNavigation(
@@ -21,33 +24,25 @@ fun AppNavigation(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "dashboard",
+        startDestination = DashboardRoute,
         modifier = modifier
     ){
-        composable("dashboard"){
+        composable<DashboardRoute>{
             DashboardScreen(
                 container = container,
                 onNavigateToAddGame = {
-                    navController.navigate("addGame")
+                    navController.navigate(AddGameRoute())
                 },
-                onNavigateEditGame = { Id ->
-                    navController.navigate("addGame?gameId=$Id")
+                onNavigateToDetail = { id ->
+                    navController.navigate(GameDetailRoute(id))
                 }
             )
         }
 
-        composable(
-            route = "addGame?gameId={gameId}",
-            arguments = listOf(navArgument("gameId"){
-                type = NavType.IntType
-                defaultValue = -1
-            })
-        ){ backStackEntry ->
-            val gameId = backStackEntry.arguments?.read {
-                getInt("gameId")
-            } ?: -1
+        composable<AddGameRoute>{ backStackEntry ->
+            val route = backStackEntry.toRoute<AddGameRoute>()
             AddGameScreen(
-                gameId = gameId,
+                gameId = route.gameId,
                 gameDao = container.db.gameDao(),
                 onBack = { navController.popBackStack() },
                 onSaveSuccess = { navController.popBackStack() },
@@ -55,5 +50,35 @@ fun AppNavigation(
                     .fillMaxSize()
             )
         }
+
+        composable<GameDetailRoute>{ backStackEntry ->
+            val route = backStackEntry.toRoute<GameDetailRoute>()
+            var gameEntity by remember { mutableStateOf<GameEntity?>(null) }
+            LaunchedEffect(route.gameId){
+                gameEntity = container.gameRepository.getGameById(route.gameId)
+            }
+            gameEntity?.let { game ->
+                val inLibrary = game.status != "NONE"
+                GameDetailScreen(
+                    gameTitle = game.title,
+                    platform = game.platforms,
+                    inInLibrary = inLibrary,
+                    coverImageUrl = game.coverUrl,
+                    onBackClick = { navController.popBackStack() },
+                    onAddToLibrary = {navController.navigate(AddGameRoute(gameId = game.id))},
+                    onEditGame = {navController.navigate(AddGameRoute(gameId = game.id))},
+                    onDelete = {navController.popBackStack()}
+                )
+            }
+        }
     }
 }
+
+@Serializable
+object DashboardRoute
+
+@Serializable
+data class AddGameRoute(val gameId: Int = -1)
+
+@Serializable
+data class GameDetailRoute(val gameId: Int)

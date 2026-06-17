@@ -1,5 +1,6 @@
 package org.ensosurei.trophytrack.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,7 +56,7 @@ import trophytrack.shared.generated.resources.ic_profile
 fun DashboardScreen(
     container: AppContainer,
     onNavigateToAddGame: () -> Unit,
-    onNavigateEditGame: (Int) -> Unit,
+    onNavigateToDetail: (Int) -> Unit
 ){
     var currentScreen by remember { mutableIntStateOf(0) }
     var selectedCategoryIndex by remember { mutableIntStateOf(0) }
@@ -205,6 +206,7 @@ fun DashboardScreen(
                                             modifier = Modifier
                                                 .width(120.dp)
                                                 .height(175.dp)
+                                                .clickable{onNavigateToDetail(game.id)}
                                         )
                                     }
                                 }
@@ -216,7 +218,7 @@ fun DashboardScreen(
                         modifier = Modifier.fillMaxWidth().weight(1f),
                         gameList = filterGames,
                         onGameSelected = { game ->
-                            onNavigateEditGame(game.id)
+                            onNavigateToDetail(game.id)
                         }
                     )
                 }
