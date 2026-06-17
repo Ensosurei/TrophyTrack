@@ -13,8 +13,9 @@ fun main() = application {
     val store = DataStoreFactory()
     val database = dataBuilder.createBuilder().build()
     val gameDao = database.gameDao()
+    val gameNotesDao = database.gameNotesDao()
     val apiClient = RawgApiClient()
-    val gameRepository = GameRepository(apiClient = apiClient, gameDao = gameDao)
+    val gameRepository = GameRepository(apiClient = apiClient, gameDao = gameDao, gameNotesDao = gameNotesDao)
 
     val appContainer = AppContainer(store,dataBuilder, gameRepository)
     Window(
