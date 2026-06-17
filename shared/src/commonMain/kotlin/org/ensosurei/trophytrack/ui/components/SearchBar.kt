@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.ensosurei.trophytrack.ui.theme.purple
+import org.ensosurei.trophytrack.ui.theme.pink
 import org.ensosurei.trophytrack.ui.theme.surface
 import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
@@ -27,6 +27,7 @@ import trophytrack.shared.generated.resources.ic_search
 fun SearchBar(
     modifier: Modifier = Modifier,
     query: String,
+    onFilterClick: () -> Unit,
     onQueryChange: (String) -> Unit
 ){
     Row(
@@ -49,13 +50,13 @@ fun SearchBar(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = surface,
                 unfocusedContainerColor = surface,
-                focusedBorderColor = purple,
+                focusedBorderColor = pink,
                 unfocusedBorderColor = white.copy(alpha = 0.5f)
             )
         )
 
         IconButton(
-            onClick = {},
+            onClick = onFilterClick,
             modifier = Modifier.padding(start = 8.dp)
                 .background(color = surface, shape = RoundedCornerShape(16.dp)),
         ){

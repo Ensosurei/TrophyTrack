@@ -21,6 +21,6 @@ actual class DatabaseBuilder() {
         }
         val builder = Room.databaseBuilder<AppDatabase>(name = finalDbPath)
         builder.setDriver(BundledSQLiteDriver())
-        return builder
+        return builder.fallbackToDestructiveMigration(false)
     }
 }

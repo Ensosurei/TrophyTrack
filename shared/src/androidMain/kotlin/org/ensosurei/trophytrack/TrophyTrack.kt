@@ -12,8 +12,10 @@ class TrophyTrackApp : Application(){
         val store = DataStoreFactory(this)
         val database = builder.createBuilder().build()
         val gameDao = database.gameDao()
+        val gameNotesDao = database.gameNotesDao()
         val apiClient = RawgApiClient()
-        val gameRepository = GameRepository(apiClient = apiClient, gameDao = gameDao)
+        val gameRepository = GameRepository(apiClient = apiClient, gameDao = gameDao, gameNotesDao = gameNotesDao)
+
 
         AppContainer(store,builder, gameRepository)
     }

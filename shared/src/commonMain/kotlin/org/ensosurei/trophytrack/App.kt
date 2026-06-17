@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.ensosurei.trophytrack.ui.components.GamesGrid
+import org.ensosurei.trophytrack.ui.screens.AppNavigation
 import org.ensosurei.trophytrack.ui.screens.DashboardScreen
 import org.ensosurei.trophytrack.ui.theme.TrophyTrackTheme
 import org.jetbrains.compose.resources.painterResource
@@ -39,8 +40,14 @@ fun App(container: AppContainer) {
     val scope = rememberCoroutineScope()
 
     TrophyTrackTheme {
-        Scaffold { paddingValues ->
-            DashboardScreen(paddingValues = paddingValues,container = container)
+        Scaffold(
+            modifier = Modifier.fillMaxSize()
+        ) { paddingValues ->
+            AppNavigation(
+                container = container,
+                modifier = Modifier.padding(paddingValues)
+            )
+
         }
     }
 }

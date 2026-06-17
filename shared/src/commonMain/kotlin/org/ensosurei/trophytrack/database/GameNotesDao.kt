@@ -14,6 +14,6 @@ interface GameNotesDao {
     @Query("SELECT * FROM GameNotesEntity WHERE gameId= :id")
     fun getNotes(id:Int): Flow<List<GameNotesEntity>>
 
-    @Delete
-    suspend fun deleteNote(note: GameNotesEntity)
+    @Query("DELETE FROM GameNotesEntity WHERE id= :id")
+    suspend fun deleteNote(id: Int)
 }
