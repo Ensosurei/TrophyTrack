@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import jdk.internal.net.http.common.Log
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -164,10 +165,15 @@ fun DashboardScreen(
                                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                                 ){
                                     items(playingGames){ game ->
-                                        GameMiniCard(gameEntity = game, imageUrl = game.coverUrl,
+                                        GameMiniCard(
+                                            gameEntity = game,
+                                            imageUrl = game.coverUrl,
                                             modifier = Modifier
                                                 .width(120.dp)
-                                                .height(175.dp)
+                                                .height(175.dp),
+                                            onCardClick = {
+                                                onNavigateToDetail(game.id)
+                                            }
                                         )
                                     }
                                 }
@@ -202,11 +208,15 @@ fun DashboardScreen(
                                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
                                     items(completedGames){ game ->
-                                        GameMiniCard(gameEntity = game, imageUrl = game.coverUrl,
+                                        GameMiniCard(
+                                            gameEntity = game,
+                                            imageUrl = game.coverUrl,
                                             modifier = Modifier
                                                 .width(120.dp)
-                                                .height(175.dp)
-                                                .clickable{onNavigateToDetail(game.id)}
+                                                .height(175.dp),
+                                            onCardClick = {
+                                                onNavigateToDetail(game.id)
+                                            }
                                         )
                                     }
                                 }

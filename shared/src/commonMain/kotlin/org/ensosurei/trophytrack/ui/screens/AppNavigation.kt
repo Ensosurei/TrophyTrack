@@ -55,7 +55,7 @@ fun AppNavigation(
             val route = backStackEntry.toRoute<GameDetailRoute>()
             var gameEntity by remember { mutableStateOf<GameEntity?>(null) }
             LaunchedEffect(route.gameId){
-                gameEntity = container.gameRepository.getGameById(route.gameId)
+                gameEntity = container.db.gameDao().getGameById(route.gameId)
             }
             gameEntity?.let { game ->
                 val inLibrary = game.status != "NONE"
