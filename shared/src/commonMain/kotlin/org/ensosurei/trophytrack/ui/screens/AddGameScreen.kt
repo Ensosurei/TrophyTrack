@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -49,6 +51,7 @@ import org.ensosurei.trophytrack.database.GameDao
 import org.ensosurei.trophytrack.database.GameEntity
 import org.ensosurei.trophytrack.ui.components.CategoryChip
 import org.ensosurei.trophytrack.ui.theme.surface
+import org.ensosurei.trophytrack.ui.theme.surfaceVariant
 import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
 import trophytrack.shared.generated.resources.Res
@@ -65,41 +68,46 @@ fun AddGameScreen(
     onSaveSuccess: () -> Unit,
     modifier: Modifier
 ) {
-    val gameFromDbFlow = remember(gameId) {
-        gameDao.getAllGames().map { list -> list.find { it.id == gameId } }
-    }
-    val gameFromDb by gameFromDbFlow.collectAsState(initial = null)
+    val isNewGame = gameId == -1
 
     var titleText by remember { mutableStateOf("") }
-    var coverUrlText by remember { mutableStateOf("") }
     var hoursText by remember { mutableStateOf("0") }
+    var platformText by remember { mutableStateOf("") }
     var selectedStatus by remember { mutableStateOf("PLAYING") }
-    var selectedPlatforms by remember { mutableStateOf(setOf<String>()) }
-    var localImageBytes by remember { mutableStateOf<ByteArray?>(null) }
-    val isNewGame = remember { gameId == -1 }
+    var gameFromDb by remember { mutableStateOf<GameEntity?>(null) }
+
+    var finalCover by remember { mutableStateOf("") }
+    var finalPlatforms by remember { mutableStateOf<String?>("") }
 
     val scope = rememberCoroutineScope()
-    val launcher = rememberFilePickerLauncher(type = PickerType.Image){ file ->
+    val launcher = rememberFilePickerLauncher(
+        type = PickerType.Image,
+        mode = PickerMode.Single
+    ){ file ->
         if(file != null){
             scope.launch {
-                localImageBytes = file.readBytes()
+                val selectedBytes = file.readBytes()
+                finalCover = saveImageLocalStorage(selectedBytes)
             }
         }
     }
 
-    LaunchedEffect(gameFromDb){
-        if (gameId != -1) {
-            gameFromDb?.let { game ->
+    LaunchedEffect(gameId){
+        if (!isNewGame) {
+            val game = gameDao.getGameById(gameId)
+            if(game != null){
+                gameFromDb = game
                 titleText = game.title
-                coverUrlText = game.coverUrl
                 hoursText = game.hoursPlayed.toString()
-                selectedStatus = game.status
-                selectedPlatforms = game.platforms.split(", ").filter { it.isNotEmpty() }.toSet()
+                selectedStatus = if(game.status == "NONE") "PLAYING" else game.status
+                finalCover = game.coverUrl
+                finalPlatforms = game.platforms
             }
         }
     }
 
     Column(
+
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
@@ -123,52 +131,33 @@ fun AddGameScreen(
                     tint = white
                 )
             }
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Add to Collection",
-                style = MaterialTheme.typography.titleLarge,
-                color = white
+                text = if (isNewGame || (gameFromDb?.status == "NONE")) "Add New Game" else "Edit Game",
+                color = white,
+                fontSize = 20.sp
             )
         }
-        if(localImageBytes != null){
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        if(finalCover.isNotEmpty()){
             Card(
                 modifier = Modifier
                     .width(180.dp)
                     .height(240.dp)
                     .clickable{launcher.launch()},
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 AsyncImage(
-                    model = localImageBytes,
+                    model = finalCover,
                     contentDescription = "New Local Cover",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxSize()
                 )
             }
-        } else if(coverUrlText.isNotEmpty()) {
-            Card(
-                modifier = Modifier
-                    .width(180.dp)
-                    .height(240.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ){
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clickable{launcher.launch()}
-                ){
-                    AsyncImage(
-                        model = coverUrlText,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize()
-                    )
-                }
-            }
-        }
-        else {
+        } else{
             Card(
                 modifier = Modifier
                     .width(180.dp)
@@ -200,31 +189,32 @@ fun AddGameScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
+
         OutlinedTextField(
             value = titleText,
-            onValueChange = { titleText = it },
+            onValueChange = { if(isNewGame) titleText = it },
             label = { Text("Game title") },
+            enabled = isNewGame,
             modifier = Modifier
                 .fillMaxWidth(),
             singleLine = true
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         OutlinedTextField(
             value = hoursText,
-            onValueChange = { newText ->
-                if (newText.all { it.isDigit() || it == '.' } && newText.count { it == '.' } <= 1) {
-                    hoursText = newText
-                }
-            },
+            onValueChange = {hoursText = it},
             label = { Text("Played Hours") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
-        if (isNewGame || (gameFromDb?.origin ?: "MANUAL") == "MANUAL"){
+        if (isNewGame){
             Text(
-                text = "Platforms",
+                text = "Select Platforms",
                 color = white,
                 fontSize = 16.sp,
                 modifier = Modifier
@@ -237,22 +227,43 @@ fun AddGameScreen(
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ){
-                val availablePlatforms = listOf("PC", "Playstation", "Xbox")
+                val availablePlatforms = listOf("PC", "PS5", "Xbox Series", "Nintendo Switch", "Mobile")
                 availablePlatforms.forEach { platform ->
-                   val isSelected = selectedPlatforms.contains(platform)
-                    CategoryChip(
-                        text = platform,
-                        isSelected = isSelected,
-                        onClick = {
-                            selectedPlatforms = if(isSelected){
-                                selectedPlatforms - platform
-                            }else{
-                                selectedPlatforms + platform
+                   val isSelected = platformText.contains(platform)
+                    Box(
+                        modifier = Modifier
+                            .background(color = if(isSelected) surfaceVariant else surfaceVariant.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .clickable{
+                                if(isSelected){
+                                    platformText = platformText
+                                        .split(", ")
+                                        .filter { it != platform && it.isNotEmpty() }
+                                        .joinToString(", ")
+                                } else {
+                                    platformText = if(platformText.isEmpty()) platform else "$platformText, $platform"
+                                }
                             }
-                        }
-                    )
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Text(
+                            text = platform,
+                            color = if(isSelected) white else white.copy(0.6f),
+                            fontSize = 14.sp
+                        )
+                    }
                 }
             }
+        } else {
+            OutlinedTextField(
+                value = platformText,
+                onValueChange = {},
+                label = { Text("Platforms") },
+                enabled = false,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
         Text(
@@ -262,45 +273,32 @@ fun AddGameScreen(
             modifier = Modifier
                 .fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            CategoryChip(
-                text = "Playing Now",
-                isSelected = selectedStatus == "PLAYING",
-                onClick = { selectedStatus = "PLAYING" },
-                modifier = Modifier
-                    .weight(1f)
-            )
-            CategoryChip(
-                text = "Completed",
-                isSelected = selectedStatus == "COMPLETED",
-                onClick = { selectedStatus = "COMPLETED" },
-                modifier = Modifier
-                    .weight(1f)
-            )
+           val statuses = listOf("PLAYING", "COMPLETED")
+            statuses.forEach { status ->
+                CategoryChip(
+                    text = status,
+                    isSelected = selectedStatus == status,
+                    onClick = { selectedStatus = status }
+                )
+            }
         }
+
         Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             onClick = {
-                var finalCover = coverUrlText
-                val finalPlatforms = if (gameId == -1 || gameFromDb?.origin == "MANUAL") {
-                    if (selectedPlatforms.isEmpty()) "PC" else selectedPlatforms.joinToString(", ")
-                } else {
-                    gameFromDb?.platforms
-                }
-                if(localImageBytes != null){
-                   val savedPath = saveImageLocalStorage(localImageBytes!!)
-                    finalCover = savedPath
-                    coverUrlText = savedPath
-                }
-
                 val hours = hoursText.toFloatOrNull() ?: 0f;
                 val actualTime = Clock.System.now().toEpochMilliseconds()
                 val updateDate = if (isNewGame) actualTime else (gameFromDb?.addedAt ?: actualTime)
+
                 val updatedGame = GameEntity(
                     id = if (isNewGame) 0 else gameId,
                     coverUrl = finalCover,
@@ -313,6 +311,7 @@ fun AddGameScreen(
                     addedAt = updateDate,
                     updateAt = actualTime
                 )
+
                 scope.launch {
                     if (isNewGame) {
                         gameDao.insertGame(updatedGame)
