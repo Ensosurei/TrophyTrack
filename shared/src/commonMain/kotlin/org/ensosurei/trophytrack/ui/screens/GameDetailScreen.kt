@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,19 +43,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.room.util.TableInfo
 import coil3.compose.AsyncImage
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.ensosurei.trophytrack.database.GameEntity
 import org.ensosurei.trophytrack.ui.theme.surface
 import org.ensosurei.trophytrack.ui.theme.surfaceVariant
 import org.ensosurei.trophytrack.ui.theme.white
 import org.jetbrains.compose.resources.vectorResource
 import trophytrack.shared.generated.resources.Res
 import trophytrack.shared.generated.resources.ic_arrowBack
+import kotlin.time.Instant
 
 @Composable
 fun GameDetailScreen(
-    gameTitle: String,
-    platform: String,
+    game: GameEntity,
     inInLibrary: Boolean,
-    coverImageUrl: String,
     onBackClick: () -> Unit,
     onAddToLibrary: () -> Unit,
     onEditGame: () -> Unit,
@@ -78,7 +82,7 @@ fun GameDetailScreen(
                     .height(300.dp)
             ){
                 AsyncImage(
-                    model = coverImageUrl,
+                    model = game.coverUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -117,24 +121,9 @@ fun GameDetailScreen(
                     .fillMaxWidth()
                     .padding(16.dp)
             ){
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = surfaceVariant,
-                ){
-                    Text(
-                        text = platform,
-                        color = white,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp, vertical = 4.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = gameTitle,
+                    text = game.title,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = white,
@@ -196,11 +185,11 @@ fun GameDetailScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ){
                         if(inInLibrary){
-                            Text(
-                                text = "This game is part of your library",
-                                color = white.copy(0.7f),
-                                fontSize = 14.sp
-                            )
+                            InfoRow("Plataforms", value = game.platforms)
+                            InfoRow("Hours Played", game.hoursPlayed.toString())
+                            InfoRow("Status", game.status)
+                            InfoRow("Added At", formatEpochMillis(game.addedAt))
+                            InfoRow("Updated At", formatEpochMillis(game.updateAt))
                         }else{
                             Text(
                                 text = "This game is not part of your library",
@@ -226,5 +215,44 @@ fun GameDetailScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            color = white.copy(alpha = 0.6f),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal
+        )
+        Text(
+            text = value,
+            color = white,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+fun formatEpochMillis(millis: Long): String {
+    return try{
+        val instant = Instant.fromEpochMilliseconds(millis)
+        val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+
+        val day = localDateTime.day.toString().padStart(2,'0')
+        val month = localDateTime.month.toString().padStart(2,'0')
+        val year = localDateTime.year
+        val hour = localDateTime.hour.toString().padStart(2,'0')
+        val minute = localDateTime.minute.toString().padStart(2,'0')
+
+        "$day/$month/$year $hour:$minute"
+    } catch (e: Exception){
+        "No available"
     }
 }

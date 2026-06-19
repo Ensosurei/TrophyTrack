@@ -60,10 +60,8 @@ fun AppNavigation(
             gameEntity?.let { game ->
                 val inLibrary = game.status != "NONE"
                 GameDetailScreen(
-                    gameTitle = game.title,
-                    platform = game.platforms,
+                    game = game,
                     inInLibrary = inLibrary,
-                    coverImageUrl = game.coverUrl,
                     onBackClick = { navController.popBackStack() },
                     onAddToLibrary = {navController.navigate(AddGameRoute(gameId = game.id))},
                     onEditGame = {navController.navigate(AddGameRoute(gameId = game.id))},
